@@ -11,6 +11,8 @@ import (
 	"sync"
 )
 
+const MAX_PARALLEL_PROCESS = 2
+
 func main() {
 
 	/* sources := []string{"https://adjust.com", "https://google.com", "https://cimri.com"}
@@ -24,10 +26,15 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	wg.Add(len(sources))
-
+	waitChan := make(chan struct{}, MAX_PARALLEL_PROCESS)
 	for _, source := range sources {
+		waitChan <- struct{}{}
 		go func(source string) {
-			defer wg.Done()
+
+			defer func() {
+				wg.Done()
+				<-waitChan
+			}()
 
 			response := makeRequest(source)
 			result := getMD5Hash(string(response))
