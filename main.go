@@ -1,20 +1,20 @@
 package main
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"sync"
+	"time"
+
+	"github.com/frkntplglu/myhttp/pkg/hash"
+	"github.com/frkntplglu/myhttp/pkg/httpclient"
+	"github.com/frkntplglu/myhttp/pkg/semaphore"
 )
 
 func main() {
 
-	/* sources := []string{"https://adjust.com", "https://google.com", "https://cimri.com"}
-	 */
+	// Add flag to determine number of parallel process
 	parallel := flag.Int("parallel", 10, "You can limit number of the goroutines working parallel at the same time")
 	flag.Parse()
 
@@ -25,22 +25,26 @@ func main() {
 		return
 	}
 
+	// Create semaphore to limit the maximum number of parallel process
+	sem := semaphore.New(*parallel)
+
 	wg := sync.WaitGroup{}
 
-	wg.Add(len(sources))
-	waitChan := make(chan struct{}, *parallel)
-
 	for _, source := range sources {
-		waitChan <- struct{}{}
+		wg.Add(1)
+		sem.Acquire()
 		go func(source string) {
+			defer sem.Release()
+			defer wg.Done()
 
-			defer func() {
-				wg.Done()
-				<-waitChan
-			}()
+			client := httpclient.New(5 * time.Second)
+			body, err := client.Get(source)
+			if err != nil {
+				log.Printf("%v error for %s", err, source)
+			}
 
-			response := makeRequest(source)
-			result := getMD5Hash(string(response))
+			result := hash.GetMd5Hash(string(body))
+
 			fmt.Printf("%s %s \n", source, result)
 
 		}(source)
@@ -48,26 +52,4 @@ func main() {
 
 	wg.Wait()
 
-}
-
-func makeRequest(url string) []byte {
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return body
-}
-
-func getMD5Hash(value string) string {
-	hash := md5.Sum([]byte(value))
-	return hex.EncodeToString(hash[:])
 }
