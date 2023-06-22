@@ -2,7 +2,7 @@
 
 ## Introduction
 
-MyHttp Tool is designed to simplify the process of making HTTP requests and extracting essential information from the responses. By leveraging the tool's parallel execution capability, you can significantly reduce the overall execution time, making it ideal for scenarios involving multiple requests.
+MyHttp Tool is designed to simplify the process of making HTTP requests and hashing the response. By leveraging the tool's parallel execution capability, you can significantly reduce the overall execution time, making it ideal for scenarios involving multiple requests.
 
 The tool comprises three packages: httpclient, semaphore, and urls. The httpclient package handles the HTTP requests, the semaphore package manages concurrent execution, and the urls package provides URL validation and handling utilities.
 
@@ -33,7 +33,7 @@ cd myhttp
 3.  Build the executable by running the following command:
 
 ```bash
-go build
+go build -o myhttp
 ```
 
 This will generate an executable file named **myhttp** in the current directory.
@@ -48,18 +48,18 @@ Options:
 -args
     The URL to make an HTTP request to (required)
 
--parallel int
+--parallel int
     The maximum number of parallel requests (default 10)
 ```
 
 The args will be your the target URL(s) to make the HTTP request to.
 
-The -parallel option (optional) allows you to specify the maximum number of parallel requests to execute. If not provided, the default limit is set to 10.
+The --parallel option (optional) allows you to specify the maximum number of parallel requests to execute. If not provided, the default limit is set to 10.
 
 Here's an example command that makes a request to **https://example.com** and **http://adjust.com** with a maximum of 5 parallel requests:
 
 ```bash
-./myhttp -parallel=5 https://example.com adjust.com
+./myhttp --parallel=5 https://example.com adjust.com
 ```
 
 5.  Upon execution, the tool will make the HTTP request and print the address of the request along with the MD5 hash of the response. The order in which addresses are printed may vary due to parallel execution. This is example of output :
