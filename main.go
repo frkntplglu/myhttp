@@ -10,11 +10,11 @@ import (
 	"github.com/frkntplglu/myhttp/pkg/hash"
 	"github.com/frkntplglu/myhttp/pkg/httpclient"
 	"github.com/frkntplglu/myhttp/pkg/semaphore"
+	"github.com/frkntplglu/myhttp/pkg/url"
 )
 
 func main() {
 
-	// Add flag to determine number of parallel process
 	parallel := flag.Int("parallel", 10, "You can limit number of the goroutines working parallel at the same time")
 	flag.Parse()
 
@@ -25,7 +25,8 @@ func main() {
 		return
 	}
 
-	// Create semaphore to limit the maximum number of parallel process
+	sources = url.ProtocolCheck(sources)
+
 	sem := semaphore.New(*parallel)
 
 	wg := sync.WaitGroup{}
