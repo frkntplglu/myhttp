@@ -1,6 +1,9 @@
-package url
+package urls
 
-import "strings"
+import (
+	"net/url"
+	"strings"
+)
 
 func ProtocolCheck(urlList []string) []string {
 	var modifiedUrls []string
@@ -14,4 +17,13 @@ func ProtocolCheck(urlList []string) []string {
 	}
 
 	return modifiedUrls
+}
+
+func IsValidUrl(u string) bool {
+	parsedUrl, err := url.Parse(u)
+	if err != nil {
+		return false
+	}
+
+	return parsedUrl.Scheme != "" && parsedUrl.Host != ""
 }

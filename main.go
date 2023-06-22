@@ -10,7 +10,7 @@ import (
 	"github.com/frkntplglu/myhttp/pkg/hash"
 	"github.com/frkntplglu/myhttp/pkg/httpclient"
 	"github.com/frkntplglu/myhttp/pkg/semaphore"
-	"github.com/frkntplglu/myhttp/pkg/url"
+	"github.com/frkntplglu/myhttp/pkg/urls"
 )
 
 func main() {
@@ -19,19 +19,30 @@ func main() {
 	flag.Parse()
 
 	sources := flag.Args()
-
 	if len(sources) == 0 {
 		log.Println("You should provide sources to make an http request")
 		return
 	}
 
-	sources = url.ProtocolCheck(sources)
+	// First check protocol is exist or not
+	sources = urls.ProtocolCheck(sources)
+	fmt.Println("sources : ", sources)
+	// Then validate all urls
+	var validSources []string
+
+	for _, source := range sources {
+		if !urls.IsValidUrl(source) {
+			break
+		}
+
+		validSources = append(validSources, source)
+	}
 
 	sem := semaphore.New(*parallel)
 
 	wg := sync.WaitGroup{}
 
-	for _, source := range sources {
+	for _, source := range validSources {
 		wg.Add(1)
 		sem.Acquire()
 		go func(source string) {
@@ -41,12 +52,13 @@ func main() {
 			client := httpclient.New(5 * time.Second)
 			body, err := client.Get(source)
 			if err != nil {
+				// This only prints the error to not terminate the whole program so that even if an error occurred tool can continue with other parameters
 				log.Printf("%v error for %s", err, source)
+			} else {
+				// This is for preventing to hash body as an empty string while an error occurred
+				result := hash.GetMd5Hash(string(body))
+				fmt.Printf("%s %s \n", source, result)
 			}
-
-			result := hash.GetMd5Hash(string(body))
-
-			fmt.Printf("%s %s \n", source, result)
 
 		}(source)
 	}

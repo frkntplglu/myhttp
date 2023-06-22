@@ -1,4 +1,4 @@
-package url
+package urls
 
 import (
 	"reflect"
@@ -32,6 +32,59 @@ func TestProtocolCheck(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ProtocolCheck(tt.urlList); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ProtocolCheck() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsValidUrl(t *testing.T) {
+	tests := []struct {
+		url  string
+		want bool
+	}{
+
+		{
+			url:  "https",
+			want: false,
+		},
+		{
+			url:  "https://",
+			want: false,
+		},
+		{
+			url:  "",
+			want: false,
+		},
+		{
+			url:  "http://www",
+			want: true,
+		},
+
+		{
+			url:  "adjust.com",
+			want: false,
+		},
+		{
+			url:  "http://www.adjust.com",
+			want: true,
+		},
+		{
+			url:  "https://www.adjust.com/tr/",
+			want: true,
+		},
+		{
+			url:  "/testing-path",
+			want: false,
+		},
+		{
+			url:  "alskjff#?asf//dfas",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run("Test for different strings", func(t *testing.T) {
+			if got := IsValidUrl(tt.url); got != tt.want {
+				t.Errorf("IsValidUrl() = %v, want %v", got, tt.want)
 			}
 		})
 	}
