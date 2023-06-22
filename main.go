@@ -17,7 +17,6 @@ func main() {
 
 	parallel := flag.Int("parallel", 10, "You can limit number of the goroutines working parallel at the same time")
 	flag.Parse()
-
 	sources := flag.Args()
 	if len(sources) == 0 {
 		log.Println("You should provide sources to make an http request")
@@ -26,7 +25,6 @@ func main() {
 
 	// First check protocol is exist or not
 	sources = urls.ProtocolCheck(sources)
-	fmt.Println("sources : ", sources)
 	// Then validate all urls
 	var validSources []string
 
