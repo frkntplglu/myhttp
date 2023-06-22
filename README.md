@@ -8,7 +8,7 @@ The tool comprises three packages: httpclient, semaphore, and urls. The httpclie
 
 ## Requirements
 
-To run the HTTP Request Tool, you need the following:
+To run the MyHttp, you need the following:
 
 - Go programming language (version 1.16 or later) installed on your system.
 - Internet connectivity to make HTTP requests.
@@ -16,7 +16,7 @@ To run the HTTP Request Tool, you need the following:
 
 ## Usage
 
-Follow the steps below to use the HTTP Request Tool:
+Follow the steps below to use the MyHttp:
 
 1.  Clone the repository to your local machine:
 
